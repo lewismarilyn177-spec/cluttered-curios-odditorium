@@ -1,0 +1,397 @@
+:root {
+  --bg-deep: #1a1423;
+  --bg-panel: #1f182e;
+  --bg-vignette: radial-gradient(ellipse at center, transparent 40%, rgba(10,8,18,0.85) 100%);
+  --brass: #c9a84c;
+  --brass-dim: #9d823a;
+  --brass-bright: #e8c86d;
+  --ink: #f0e8d8;
+  --ink-dim: #b8a898;
+  --ink-muted: #8a7a6a;
+  --accent: #d4a53a;
+  --danger: #c0392b;
+  --success: #27ae60;
+  --panel-border: 4px;
+  --radius: 4px;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  background: var(--bg-deep);
+  color: var(--ink);
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background: var(--bg-vignette);
+  pointer-events: none;
+  z-index: 100;
+}
+
+#topbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+  background: linear-gradient(180deg, rgba(26,20,35,0.98) 0%, rgba(26,20,35,0.7) 100%);
+  border-bottom: 2px solid var(--brass-dim);
+  z-index: 50;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+#levelName {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.25rem;
+  font-weight: 400;
+  color: var(--brass);
+  text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+  letter-spacing: 0.5px;
+}
+
+#scoreWrap, #streakWrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(31,24,46,0.9);
+  border: 1px solid var(--brass-dim);
+  border-radius: var(--radius);
+  padding: 6px 12px;
+  min-width: 110px;
+}
+
+.label {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--ink-muted);
+}
+
+#scoreVal, #streakVal {
+  font-family: "SF Mono", "Fira Code", "Consolas", monospace;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--brass-bright);
+}
+
+#timerWrap {
+  flex: 1;
+  max-width: 400px;
+  height: 18px;
+  background: rgba(20,16,30,0.9);
+  border: 2px solid var(--brass-dim);
+  border-radius: 9px;
+  overflow: hidden;
+  position: relative;
+}
+
+#timerWrap::before {
+  content: "";
+  position: absolute;
+  inset: 2px;
+  background: linear-gradient(90deg, var(--brass) 0%, var(--brass-bright) 50%, var(--accent) 100%);
+  border-radius: 7px;
+  transform-origin: left center;
+  transform: scaleX(1);
+  transition: transform 0.1s linear;
+}
+
+#timerWrap.warning::before {
+  background: linear-gradient(90deg, var(--danger) 0%, #e74c3c 100%);
+}
+
+#timerBar {
+  width: 100%;
+  height: 100%;
+}
+
+button#hintBtn, button#muteBtn {
+  width: 48px;
+  height: 48px;
+  border: 2px solid var(--brass-dim);
+  border-radius: var(--radius);
+  background: rgba(31,24,46,0.95);
+  color: var(--brass);
+  font-size: 1.25rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+}
+
+button#hintBtn:hover, button#muteBtn:hover {
+  background: rgba(201,168,76,0.15);
+  border-color: var(--brass);
+  color: var(--brass-bright);
+  transform: scale(1.05);
+}
+
+button#hintBtn:active, button#muteBtn:active {
+  transform: scale(0.98);
+}
+
+button#hintBtn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  transform: none;
+}
+
+#hintCount {
+  font-family: "SF Mono", "Fira Code", "Consolas", monospace;
+  font-size: 0.75rem;
+  font-weight: 600;
+  margin-left: 2px;
+}
+
+#stage {
+  position: fixed;
+  top: 64px;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  gap: 12px;
+  z-index: 10;
+}
+
+#panels {
+  display: flex;
+  gap: 16px;
+  flex-shrink: 0;
+}
+
+#panelL, #panelR {
+  width: 1000px;
+  height: 600px;
+  background: var(--bg-panel);
+  border: var(--panel-border) solid var(--brass-dim);
+  border-radius: 8px;
+  box-shadow:
+    0 0 0 1px rgba(201,168,76,0.15) inset,
+    0 8px 32px rgba(0,0,0,0.6),
+    0 0 60px rgba(201,168,76,0.03);
+  display: block;
+  cursor: crosshair;
+  transition: box-shadow 0.2s ease;
+}
+
+#panelL:hover, #panelR:hover {
+  box-shadow:
+    0 0 0 1px rgba(201,168,76,0.15) inset,
+    0 8px 32px rgba(0,0,0,0.6),
+    0 0 80px rgba(201,168,76,0.08),
+    0 0 0 2px var(--brass);
+}
+
+#panelL.found, #panelR.found {
+  animation: flashFound 0.4s ease;
+}
+
+@keyframes flashFound {
+  0%, 100% { box-shadow: 0 0 0 1px rgba(201,168,76,0.15) inset, 0 8px 32px rgba(0,0,0,0.6); }
+  50% { box-shadow: 0 0 0 1px rgba(39,174,96,0.3) inset, 0 8px 32px rgba(0,0,0,0.6), 0 0 40px rgba(39,174,96,0.4); }
+}
+
+#counter {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1rem;
+  color: var(--ink-dim);
+  text-align: center;
+  padding: 4px 0;
+}
+
+#counter #foundCount {
+  color: var(--success);
+  font-weight: 600;
+}
+
+#counter #totalCount {
+  color: var(--brass);
+  font-weight: 600;
+}
+
+#hintline {
+  font-size: 0.875rem;
+  color: var(--ink-muted);
+  text-align: center;
+  max-width: 800px;
+  padding: 0 16px;
+}
+
+#toast {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%) translateY(100px);
+  background: rgba(26,20,35,0.95);
+  border: 2px solid var(--brass);
+  border-radius: var(--radius);
+  padding: 12px 24px;
+  color: var(--brass-bright);
+  font-size: 0.9rem;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 60;
+  transition: all 0.3s ease;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+}
+
+#toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+#overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(10,8,18,0.92);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 200;
+  opacity: 1;
+  transition: opacity 0.3s ease;
+}
+
+#overlay.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.overlay-content {
+  background: linear-gradient(160deg, rgba(31,24,46,0.98) 0%, rgba(26,20,35,0.98) 100%);
+  border: 3px solid var(--brass-dim);
+  border-radius: 12px;
+  padding: 48px 64px;
+  max-width: 560px;
+  text-align: center;
+  box-shadow:
+    0 0 0 1px rgba(201,168,76,0.2) inset,
+    0 16px 64px rgba(0,0,0,0.7),
+    0 0 120px rgba(201,168,76,0.05);
+}
+
+#overlayTitle {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 2.25rem;
+  font-weight: 400;
+  color: var(--brass);
+  margin-bottom: 16px;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.5);
+  letter-spacing: 1px;
+}
+
+#overlayText {
+  font-size: 1.1rem;
+  color: var(--ink-dim);
+  line-height: 1.7;
+  margin-bottom: 32px;
+}
+
+.overlay-content button {
+  font-family: inherit;
+  font-size: 1.1rem;
+  font-weight: 500;
+  padding: 14px 40px;
+  background: linear-gradient(180deg, var(--brass) 0%, var(--brass-dim) 100%);
+  border: 2px solid var(--brass);
+  border-radius: var(--radius);
+  color: var(--bg-deep);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  box-shadow: 0 4px 16px rgba(201,168,76,0.2);
+}
+
+.overlay-content button:hover {
+  background: linear-gradient(180deg, var(--brass-bright) 0%, var(--brass) 100%);
+  border-color: var(--brass-bright);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 24px rgba(201,168,76,0.35);
+}
+
+.overlay-content button:active {
+  transform: translateY(0);
+}
+
+.overlay-content button:focus-visible {
+  outline: 2px solid var(--brass-bright);
+  outline-offset: 3px;
+}
+
+@media (max-width: 1400px) {
+  #panelL, #panelR {
+    width: 800px;
+    height: 480px;
+  }
+}
+
+@media (max-width: 1100px) {
+  #panelL, #panelR {
+    width: 600px;
+    height: 360px;
+  }
+  #topbar {
+    padding: 0 12px;
+    height: auto;
+    min-height: 64px;
+    gap: 8px;
+  }
+  #timerWrap {
+    order: 5;
+    flex-basis: 100%;
+    max-width: none;
+    margin-top: 4px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+@media (prefers-contrast: high) {
+  :root {
+    --brass: #ffd700;
+    --brass-dim: #ffcc00;
+    --brass-bright: #fff080;
+    --ink: #ffffff;
+    --ink-dim: #dddddd;
+  }
+  #panelL, #panelR {
+    border-width: 5px;
+  }
+}
+/* keep both panels inside the viewport: each takes half the stage minus the gap */
+#panels { width: 100%; }
+#panels canvas {
+  display: block;
+  width: calc(50% - 14px);
+  height: auto;
+}
