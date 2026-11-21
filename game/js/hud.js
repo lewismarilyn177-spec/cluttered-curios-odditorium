@@ -15,6 +15,7 @@ export function bindHud(engine, opts = {}) {
   const counter = document.getElementById('counter');
   const levelName = document.getElementById('levelName');
   const hintBtn = document.getElementById('hintBtn');
+  hintBtn.addEventListener('click', () => engine.useHint());
   const hintCount = document.getElementById('hintCount');
   const muteBtn = document.getElementById('muteBtn');
   const muteIcon = document.getElementById('muteIcon');

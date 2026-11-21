@@ -78,6 +78,18 @@ function getScale(canvas) {
   return { scale, offsetX, offsetY };
 }
 
+function panelScale(canvas) {
+  const scale = Math.min(canvas.width / 1000, canvas.height / 600);
+  const offsetX = (canvas.width - 1000 * scale) / 2;
+  const offsetY = (canvas.height - 600 * scale) / 2;
+  return { scale, offsetX, offsetY };
+}
+
+function mapTo(canvas, x, y) {
+  const { scale, offsetX, offsetY } = panelScale(canvas);
+  return { x: x * scale + offsetX, y: y * scale + offsetY };
+}
+
 function drawMarkers(engineState) {
   const scene = SCENES[engineState.levelIndex];
   if (engineState.state === 'menu') {
@@ -85,17 +97,25 @@ function drawMarkers(engineState) {
     markerR.draw(new Map(), null, null);
     return;
   }
-  const foundDiffs = new Map();
-  if (scene.diffs) {
-    for (const d of scene.diffs) {
-      if (engineState.foundDiffs && engineState.foundDiffs.has(d.id)) {
-        foundDiffs.set(d.id, { x: d.cx, y: d.cy, r: d.r });
+  const collect = (canvas) => {
+    const foundDiffs = new Map();
+    if (scene.diffs) {
+      for (const d of scene.diffs) {
+        if (engineState.foundDiffs && engineState.foundDiffs.has(d.id)) {
+          const p = mapTo(canvas, d.cx, d.cy);
+          foundDiffs.set(d.id, { x: p.x, y: p.y, r: d.r * panelScale(canvas).scale });
+        }
       }
     }
-  }
-  const pulseDiff = engineState.hintPulse ? { x: engineState.hintPulse.cx, y: engineState.hintPulse.cy, r: engineState.hintPulse.r } : null;
-  markerL.draw(foundDiffs, pulseDiff, markerL.missFlash);
-  markerR.draw(foundDiffs, pulseDiff, markerR.missFlash);
+    return foundDiffs;
+  };
+  const pulse = (canvas) => {
+    if (!engineState.hintPulse) return null;
+    const p = mapTo(canvas, engineState.hintPulse.cx, engineState.hintPulse.cy);
+    return { x: p.x, y: p.y, r: engineState.hintPulse.r * panelScale(canvas).scale };
+  };
+  markerL.draw(collect(markerL.canvas), pulse(markerL.canvas), markerL.missFlash);
+  markerR.draw(collect(markerR.canvas), pulse(markerR.canvas), markerR.missFlash);
 }
 
 const originalDraw = engine.draw;
